@@ -5,28 +5,19 @@ import pandas as pd
 import time  # For loading effect
 
 # --- Load Google Sheets credentials securely from Streamlit Secrets ---
-# Your secrets should be set in Streamlit Cloud in the following format:
-#
-# [gcp_credentials]
-# type = "service_account"
-# project_id = "tco-calculator-database"
-# private_key_id = "e1e5c6b1999c30a7dff2d1b010ec9314c152c1fe"
-# private_key = """-----BEGIN PRIVATE KEY-----
-# MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCVNeLpqulgucMs
-# i4xpv6J1bRnNA0GoTE6k84kaWbAHFzVo7CkLWnewK+l2KZg68IzfTljmZUSTEWTk
-# trv2SehHe/tExFZtH2PJRQ00lm4dQUhM+4+6mLLvpyK9kGF08k0Y4/NNn12wZRVW
-# ... (rest of your key) ...
-# -----END PRIVATE KEY-----"""
-# client_email = "tco-data-access@tco-calculator-database.iam.gserviceaccount.com"
-# client_id = "107794534909469767217"
-# auth_uri = "https://accounts.google.com/o/oauth2/auth"
-# token_uri = "https://oauth2.googleapis.com/token"
-# auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
-# client_x509_cert_url = "https://www.googleapis.com/robot/v1/metadata/x509/tco-data-access%40tco-calculator-database.iam.gserviceaccount.com"
-
+# st.secrets["gcp_credentials"] should be set as a dictionary in your secrets.
 gcp_credentials = dict(st.secrets["gcp_credentials"])
 # Convert literal "\n" into actual newline characters in the private_key
 gcp_credentials["private_key"] = gcp_credentials["private_key"].replace('\\n', '\n')
+
+# --- Check that all required keys are present ---
+required_keys = ["type", "project_id", "private_key_id", "private_key", "client_email", "client_id",
+                 "auth_uri", "token_uri", "auth_provider_x509_cert_url", "client_x509_cert_url"]
+
+missing_keys = [key for key in required_keys if key not in gcp_credentials]
+if missing_keys:
+    st.error(f"Missing keys in gcp_credentials: {missing_keys}. Please check your Streamlit Secrets configuration.")
+    st.stop()
 
 # --- Connect to Google Sheets ---
 def connect_to_gsheets():
