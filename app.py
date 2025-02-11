@@ -55,27 +55,4 @@ with st.container():
         else:
             consumption_label = "Verbruik per 100 km in liter"
         consumption = st.number_input(consumption_label, min_value=0.0, value=6.5, step=0.1, format="%.2f")
-        # Price fields with euro sign
-        catalog_price = st.number_input("Catalog Price incl. options and VAT (€)", 
-                                        min_value=0.0, value=30000.0, step=100.0, format="€ %0,.2f")
-        purchase_price_incl = st.number_input("Purchase Price incl. VAT (€)", 
-                                              min_value=0.0, value=25000.0, step=100.0, format="€ %0,.2f")
-        # Purchase price excl. VAT is automatically calculated (not editable)
-        
-        st.markdown("---")
-        st.subheader("Usage")
-        annual_kilometers = st.number_input("Estimated annual kilometers (km)", 
-                                            min_value=0, value=15000, step=100, format="%d")
-        
-        st.markdown("---")
-        st.subheader("User Taxation")
-        vat_deductibility = st.number_input("VAT Deductibility (%)", 
-                                            min_value=0.0, max_value=100.0, value=35.0, step=0.1, format="%.2f")
-        corporate_tax = st.number_input("Marginal Corporate Tax (%)", 
-                                        min_value=0.0, max_value=100.0, value=25.0, step=0.1, format="%.2f")
-        income_tax = st.number_input("Marginal Income Tax (%)", 
-                                     min_value=0.0, max_value=100.0, value=50.0, step=0.1, format="%.2f")
-        
-        submit_button = st.form_submit_button(label="Calculate TCO")
-    st.markdown('</div>', unsafe_allow_html=True)
 
