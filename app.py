@@ -7,7 +7,25 @@ import time  # For loading effect
 # --- Connect to Google Sheets ---
 def connect_to_gsheets():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("gcp_credentials.json", scope)
+    import json
+import streamlit as st
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+# Load Google Sheets credentials from Streamlit Secrets
+gcp_credentials = json.loads(st.secrets["gcp_credentials"])
+
+def connect_to_gsheets():
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(gcp_credentials, scope)
+    client = gspread.authorize(creds)
+    return client
+
+# Open the Google Sheet (replace YOUR_SHEET_ID)
+SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit"
+client = connect_to_gsheets()
+sheet = client.open_by_url(SHEET_URL).sheet1  # Open first sheet
+
     client = gspread.authorize(creds)
     return client
 
