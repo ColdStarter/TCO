@@ -79,21 +79,3 @@ with st.container():
         submit_button = st.form_submit_button(label="Calculate TCO")
     st.markdown('</div>', unsafe_allow_html=True)
 
-# When the "Calculate TCO" button is clicked...
-if submit_button:
-    # Try to convert the date string to a date object.
-    try:
-        registration_date = datetime.datetime.strptime(registration_date_str, "%d/%m/%Y").date()
-    except ValueError:
-        registration_date = None
-        st.error("Registration date is not in the correct format (DD/MM/YYYY).")
-    
-    # Calculate the purchase price excl. VAT (automatically, not editable)
-    purchase_price_excl = purchase_price_incl / 1.21
-    
-    # Dummy TCO calculation (adjust this logic to your own formula)
-    tco_dummy = catalog_price + purchase_price_excl + (annual_kilometers * 0.1)
-    
-    st.markdown("### Calculations")
-    st.write(f"**Purchase Price excl. VAT:** {format_euro(purchase_price_excl)}")
-    st.write(f"**Estimated TCO:** {format_euro(tco_dummy)}")
