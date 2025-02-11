@@ -1,87 +1,85 @@
 import streamlit as st
-import datetime
+import time  # For loading effect
 
-st.set_page_config(page_title="Company Car TCO Calculator", layout="wide")
+# --- Set up page configuration ---
+st.set_page_config(page_title="TCO Calculator", layout="centered")
 
-# Function to format a number in European format (e.g., € 1.200,50)
-def format_euro(value):
-    s = f"{value:,.2f}"       # Gives, for example: "30,000.00"
-    s = s.replace(",", "X")   # Temporarily: "30X000.00"
-    s = s.replace(".", ",")   # "30X000,00"
-    s = s.replace("X", ".")   # "30.000,00"
-    return "€ " + s
-
-# --- Custom CSS for the input column ---
+# --- Custom CSS for styling ---
 st.markdown(
     """
     <style>
-    .left-col {
+    .stApp {
+        background-color: #f5f5f5;
+    }
+    .sidebar .sidebar-content {
         background-color: #003366;
         color: white;
-        padding: 20px;
-        border-radius: 10px;
-        width: 100%;
     }
-    .stNumberInput input, .stTextInput input, .stDateInput input {
-        text-align: left;
-        color: grey;
+    .stNumberInput input {
+        text-align: right;
     }
     .stButton>button {
         background-color: #0066cc;
         color: white;
-        border: none;
-        padding: 10px 20px;
         border-radius: 5px;
+        padding: 10px 20px;
+    }
+    .metric-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+    .metric-value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #003366;
+    }
+    .metric-label {
+        font-size: 16px;
+        color: gray;
     }
     </style>
-    """, unsafe_allow_html=True
+    """, 
+    unsafe_allow_html=True
 )
 
-# Use a wide column for input (left)
-with st.container():
-    st.markdown('<div class="left-col">', unsafe_allow_html=True)
-    st.header("Company Car TCO Calculator")
-    with st.form(key="tco_form"):
-        st.subheader("Voertuig")
-        # Brand and Model with placeholder values
-        brand = st.text_input("Merk", placeholder="Example: BMW", help="Example: BMW")
-        model = st.text_input("Model", placeholder="Example: X5 45e", help="Example: X5 45e")
-        # Use a date input for the registration date
-        default_date = datetime.date.today()
-        registration_date = st.date_input("Datum eerste registratie", value=default_date, help="Selecteer de datum")
-        fuel_type = st.selectbox("Type brandstof", options=["Benzine", "Diesel", "Hybride", "Elektrisch"])
-        co2 = st.number_input("CO2/km in gram", min_value=0, value=120, step=1)
-        if fuel_type == "Elektrisch":
-            consumption_label = "Verbruik per 100 km in kWh"
-        else:
-            consumption_label = "Verbruik per 100 km in liter"
-        consumption = st.number_input(consumption_label, min_value=0.0, value=6.5, step=0.1, format="%.2f")
+# --- Sidebar (Dark Blue) ---
+with st.sidebar:
+    st.markdown("## 🚗 Voertuiggegevens", unsafe_allow_html=True)
 
-        st.markdown("---")
-        st.subheader("Gebruik")
-        annual_kilometers = st.number_input("Geschat aantal jaarlijkse kilometers (km)", 
-                                            min_value=0, value=15000, step=100, format="%d")
-        
-        st.markdown("---")
-        st.subheader("Fiscaliteit gebruiker")
-        vat_deductibility = st.number_input("BTW aftrekbaarheid (%)", 
-                                            min_value=0.0, max_value=100.0, value=35.0, step=0.1, format="%.2f")
-        corporate_tax = st.number_input("Marginale vennootschapsbelasting (%)", 
-                                        min_value=0.0, max_value=100.0, value=25.0, step=0.1, format="%.2f")
-        income_tax = st.number_input("Marginale inkomensbelasting (%)", 
-                                     min_value=0.0, max_value=100.0, value=50.0, step=0.1, format="%.2f")
-        
-        submit_button = st.form_submit_button(label="Calculate TCO")
+    model = st.text_input("Model", value="X5 45e", help="Voer het model in (bijv. X5 45e)")
+    
+    prijs = st.number_input(
+        "Prijs (€)", 
+        min_value=0.0, 
+        value=50000.0, 
+        step=1000.0, 
+        format="%.2f"
+    )
+
+    lease_maanden = st.number_input(
+        "Aantal maanden leasing", 
+        min_value=1, 
+        value=36, 
+        step=1
+    )
+
+    bereken = st.button("Bereken TCO")
+
+# --- TCO Calculation and Display ---
+st.markdown("## 📊 TCO Berekening", unsafe_allow_html=True)
+
+if bereken:
+    with st.spinner("Bezig met berekenen..."):
+        time.sleep(1)  # Simulate processing time
+
+    # TCO Calculation
+    tco = prijs / lease_maanden if lease_maanden > 0 else 0
+
+    # Display result
+    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-label">Maandelijkse Total Cost of Ownership</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="metric-value">€ {tco:,.2f}</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
-
-# When the "Calculate TCO" button is clicked...
-if submit_button:
-    # Calculate the purchase price excl. VAT (automatically, not editable)
-    purchase_price_excl = purchase_price_incl / 1.21
-    
-    # Dummy TCO calculation (adjust this logic to your own formula)
-    tco_dummy = catalog_price + purchase_price_excl + (annual_kilometers * 0.1)
-    
-    st.markdown("### Calculations")
-    st.write(f"**Purchase Price excl. VAT:** {format_euro(purchase_price_excl)}")
-    st.write(f"**Estimated TCO:** {format_euro(tco_dummy)}")
