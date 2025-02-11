@@ -1,6 +1,8 @@
 import streamlit as st
 import datetime
 
+st.set_page_config(page_title="TCO Calculator", layout="wide")
+
 # Functie om een getal in Europees formaat weer te geven (bijvoorbeeld: € 1.200,50)
 def format_euro(value):
     s = f"{value:,.2f}"       # Geeft bijvoorbeeld: "30,000.00"
