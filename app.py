@@ -5,7 +5,7 @@ import pandas as pd
 import time  # For loading effect
 
 # --- Load Google Sheets credentials securely from Streamlit Secrets ---
-gcp_credentials = st.secrets["gcp_credentials"]  # FIXED: No need for json.loads()
+gcp_credentials = st.secrets["gcp_credentials"]  # No json.loads()
 
 # --- Connect to Google Sheets ---
 def connect_to_gsheets():
