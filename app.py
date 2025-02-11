@@ -1,8 +1,6 @@
 import streamlit as st
 import datetime
 
-st.set_page_config(page_title="TCO Calculator", layout="wide")
-
 # Functie om een getal in Europees formaat weer te geven (bijvoorbeeld: € 1.200,50)
 def format_euro(value):
     s = f"{value:,.2f}"       # Geeft bijvoorbeeld: "30,000.00"
@@ -53,9 +51,9 @@ with st.container():
         brandstoftype = st.selectbox("Brandstoftype", options=["Benzine", "Diesel", "Hybride", "Elektrisch"])
         co2 = st.number_input("CO2/km in gram", min_value=0, value=120, step=1)
         if brandstoftype == "Elektrisch":
-            verbruik_label = "Verbruik per 100 km in kWh"
+            verbruik_label = "Verbruik per 100 km (kWh)"
         else:
-            verbruik_label = "Verbruik per 100 km in liter"
+            verbruik_label = "Verbruik per 100 km (liter)"
         verbruik = st.number_input(verbruik_label, min_value=0.0, value=6.5, step=0.1, format="%.2f")
         # Prijsvelden met euroteken (let op: de notatie kan iets afwijken van '€ 1.200,50')
         catalogusprijs = st.number_input("Catalogusprijs inclusief opties en btw (€)", 
@@ -67,7 +65,7 @@ with st.container():
         st.markdown("---")
         st.subheader("Gebruik")
         jaarlijkse_kilometers = st.number_input("Geschat aantal jaarlijkse kilometers (km)", 
-                                                min_value=0, value=20000, step=100, format="%d")
+                                                min_value=0, value=15000, step=100, format="%d")
         
         st.markdown("---")
         st.subheader("Fiscaliteit gebruiker")
