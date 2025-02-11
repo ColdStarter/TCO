@@ -1,6 +1,8 @@
 import streamlit as st
 import datetime
 
+st.set_page_config(page_title="TCO Calculator", layout="wide")
+
 # Function to format a number in European format (e.g., € 1.200,50)
 def format_euro(value):
     s = f"{value:,.2f}"       # Gives, for example: "30,000.00"
@@ -33,8 +35,6 @@ st.markdown(
     </style>
     """, unsafe_allow_html=True
 )
-
-st.set_page_config(page_title="TCO Calculator", layout="wide")
 
 # Use a wide column for input (left)
 with st.container():
