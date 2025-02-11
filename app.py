@@ -1,7 +1,7 @@
 import streamlit as st
 import datetime
 
-st.set_page_config(page_title="TCO Calculator", layout="wide")
+st.set_page_config(page_title="Company Car TCO Calculator", layout="wide")
 
 # Function to format a number in European format (e.g., € 1.200,50)
 def format_euro(value):
@@ -39,7 +39,7 @@ st.markdown(
 # Use a wide column for input (left)
 with st.container():
     st.markdown('<div class="left-col">', unsafe_allow_html=True)
-    st.header("TCO Calculator – Input Data")
+    st.header("Company Car TCO Calculator")
     with st.form(key="tco_form"):
         st.subheader("Vehicle")
         # Brand and Model with pre-filled values
