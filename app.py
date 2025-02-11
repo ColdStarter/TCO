@@ -1,4 +1,3 @@
-import json
 import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -6,7 +5,7 @@ import pandas as pd
 import time  # For loading effect
 
 # --- Load Google Sheets credentials securely from Streamlit Secrets ---
-gcp_credentials = json.loads(st.secrets["gcp_credentials"])
+gcp_credentials = st.secrets["gcp_credentials"]  # FIXED: No need for json.loads()
 
 # --- Connect to Google Sheets ---
 def connect_to_gsheets():
