@@ -41,19 +41,19 @@ with st.container():
     st.markdown('<div class="left-col">', unsafe_allow_html=True)
     st.header("Company Car TCO Calculator")
     with st.form(key="tco_form"):
-        st.subheader("Vehicle")
+        st.subheader("Voertuig")
         # Brand and Model with pre-filled values
-        brand = st.text_input("Brand", value="BMW", help="Example: BMW")
+        brand = st.text_input("Merk", value="BMW", help="Example: BMW")
         model = st.text_input("Model", value="X5 45e", help="Example: X5 45e")
         # For the date, we use a text field with dd/mm/YYYY format.
         default_date = datetime.date.today().strftime("%d/%m/%Y")
-        registration_date_str = st.text_input("Registration Date (DD/MM/YYYY)", value=default_date)
-        fuel_type = st.selectbox("Fuel Type", options=["Petrol", "Diesel", "Hybrid", "Electric"])
-        co2 = st.number_input("CO2/km in grams", min_value=0, value=120, step=1)
-        if fuel_type == "Electric":
-            consumption_label = "Consumption per 100 km (kWh)"
+        registration_date_str = st.text_input("Datum eerste registratie (DD/MM/YYYY)", value=default_date)
+        fuel_type = st.selectbox("Type brandstof", options=["Benzine", "Diesel", "Hybride", "Electrisch"])
+        co2 = st.number_input("CO2/km in gram", min_value=0, value=120, step=1)
+        if fuel_type == "Electrisch":
+            consumption_label = "Verbruik per 100 km in kWh"
         else:
-            consumption_label = "Consumption per 100 km (liters)"
+            consumption_label = "Verbruik per 100 km in liter"
         consumption = st.number_input(consumption_label, min_value=0.0, value=6.5, step=0.1, format="%.2f")
         # Price fields with euro sign
         catalog_price = st.number_input("Catalog Price incl. options and VAT (€)", 
