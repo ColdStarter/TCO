@@ -1,61 +1,46 @@
 import streamlit as st
+import pandas as pd
 
-# --------------------------
-# Page 1: Get Make & Model
-# --------------------------
-def page_make_model():
-    st.title("Enter Car Make and Model")
-    
-    # Text inputs for make/model
-    make = st.text_input("Car Make (e.g., Toyota, Ford, Tesla)", "")
-    model = st.text_input("Car Model (e.g., Corolla, F-150, Model 3)", "")
-    
-    # 'Next' button to proceed
-    if st.button("Next"):
-        # Store inputs in session state to remember them
-        st.session_state["make"] = make
-        st.session_state["model"] = model
-        # Switch page
-        st.session_state["current_page"] = "calculator"
+st.set_page_config(page_title="TCO Calculator", layout="wide")
 
-# --------------------------
-# Page 2: Calculator
-# --------------------------
-def page_calculator():
-    # Retrieve the make/model from session state
-    make = st.session_state.get("make", "Unknown Make")
-    model = st.session_state.get("model", "Unknown Model")
+st.title("TCO Calculator")
+st.write("Enter your costs below to see the total cost of ownership.")
 
-    # Show them in the title
-    st.title(f"{make} {model} - Lease Calculator")
+col1, col2 = st.columns(2)
 
-    # -- Example lease details (you can customize these) --
-    purchase_price = st.number_input("Purchase Price", min_value=0.0, value=20000.0)
-    lease_months   = st.number_input("Number of Lease Months", min_value=1, value=36)
-    
-    # Simple monthly cost calculation
-    monthly_cost = purchase_price / lease_months
-    
-    # Display results
-    st.write(f"**Monthly Cost**: ${monthly_cost:,.2f}")
-    
-    # Button to go back to Page 1 if you want
-    if st.button("Back"):
-        st.session_state["current_page"] = "make_model"
+with col1:
+    hardware_cost = st.number_input("Hardware Cost", min_value=0.0, value=5000.0, help="One-time purchase cost")
+    down_payment = st.number_input("Down Payment (if any)", min_value=0.0, value=0.0)
+    other_one_time = st.number_input("Other One-time Costs", min_value=0.0, value=1000.0)
 
-# --------------------------
-# Main App Logic
-# --------------------------
-def main():
-    # Initialize session state for current page
-    if "current_page" not in st.session_state:
-        st.session_state["current_page"] = "make_model"  # start on Page 1
+with col2:
+    licensing_cost = st.number_input("Licensing (per year)", min_value=0.0, value=200.0)
+    maintenance_cost = st.number_input("Maintenance (per year)", min_value=0.0, value=300.0)
+    other_annual = st.number_input("Other Annual Costs", min_value=0.0, value=100.0)
 
-    # Route to the correct page
-    if st.session_state["current_page"] == "make_model":
-        page_make_model()
-    else:
-        page_calculator()
+years = st.slider("Number of years to consider", min_value=1, max_value=10, value=3)
 
-if __name__ == "__main__":
-    main()
+# Simple TCO Calculation:
+# TCO = (One-time costs) + (Annual costs * years)
+one_time_total = hardware_cost + down_payment + other_one_time
+annual_total = licensing_cost + maintenance_cost + other_annual
+tco = one_time_total + (annual_total * years)
+
+st.subheader("Results")
+
+# Headline metric
+st.metric("Total Cost of Ownership", f"${tco:,.2f}")
+
+# Breakdown
+breakdown = {
+    "Cost Type": ["One-Time", "Recurring (Over Time)"],
+    "Amount": [one_time_total, annual_total * years]
+}
+df_breakdown = pd.DataFrame(breakdown)
+st.table(df_breakdown)
+
+# Optionally, a bar chart
+chart_data = pd.DataFrame({
+    "Amount": [one_time_total, annual_total * years]
+}, index=["One-Time", "Recurring"])
+st.bar_chart(chart_data)
