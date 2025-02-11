@@ -1,20 +1,14 @@
+import json
 import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
 import time  # For loading effect
 
-# --- Connect to Google Sheets ---
-def connect_to_gsheets():
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    import json
-import streamlit as st
-import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-
-# Load Google Sheets credentials from Streamlit Secrets
+# --- Load Google Sheets credentials securely from Streamlit Secrets ---
 gcp_credentials = json.loads(st.secrets["gcp_credentials"])
 
+# --- Connect to Google Sheets ---
 def connect_to_gsheets():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
     creds = ServiceAccountCredentials.from_json_keyfile_dict(gcp_credentials, scope)
@@ -26,18 +20,10 @@ SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit"
 client = connect_to_gsheets()
 sheet = client.open_by_url(SHEET_URL).sheet1  # Open first sheet
 
-    client = gspread.authorize(creds)
-    return client
-
-# Open the sheet (replace YOUR_SHEET_ID with your actual sheet ID)
-SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit"
-client = connect_to_gsheets()
-sheet = client.open_by_url(SHEET_URL).sheet1  # Open first sheet
-
-# Function to fetch car models from Column A (skip the header)
+# --- Function to fetch car models from Column A (skip the header) ---
 def fetch_car_models():
-    models = sheet.col_values(1)[1:]
-    return models
+    models = sheet.col_values(1)[1:]  # Skip header
+    return models if models else ["Geen modellen beschikbaar"]
 
 # --- Set up page configuration ---
 st.set_page_config(page_title="TCO Calculator", layout="centered")
