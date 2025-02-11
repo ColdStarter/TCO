@@ -5,37 +5,60 @@ import pandas as pd
 import time  # For loading effect
 
 # --- Load Google Sheets credentials securely from Streamlit Secrets ---
-# st.secrets["gcp_credentials"] should be set as a dictionary in your secrets.
-gcp_credentials = dict(st.secrets["gcp_credentials"])
-# Convert literal "\n" into actual newline characters in the private_key
-gcp_credentials["private_key"] = gcp_credentials["private_key"].replace('\\n', '\n')
+try:
+    # st.secrets["gcp_credentials"] is already a dict if configured properly.
+    gcp_credentials = dict(st.secrets["gcp_credentials"])
+except Exception as e:
+    st.error("Error loading gcp_credentials from secrets: " + str(e))
+    st.stop()
 
-# --- Check that all required keys are present ---
-required_keys = ["type", "project_id", "private_key_id", "private_key", "client_email", "client_id",
-                 "auth_uri", "token_uri", "auth_provider_x509_cert_url", "client_x509_cert_url"]
+# Ensure the private key is properly formatted:
+if "private_key" in gcp_credentials:
+    # Remove any extra spaces and replace literal "\n" with actual newlines
+    gcp_credentials["private_key"] = gcp_credentials["private_key"].strip().replace('\\n', '\n')
+else:
+    st.error("private_key not found in gcp_credentials. Please check your secrets.")
+    st.stop()
 
+# Verify that all required keys are present
+required_keys = [
+    "type", "project_id", "private_key_id", "private_key", "client_email",
+    "client_id", "auth_uri", "token_uri", "auth_provider_x509_cert_url", "client_x509_cert_url"
+]
 missing_keys = [key for key in required_keys if key not in gcp_credentials]
 if missing_keys:
-    st.error(f"Missing keys in gcp_credentials: {missing_keys}. Please check your Streamlit Secrets configuration.")
+    st.error("Missing keys in gcp_credentials: " + ", ".join(missing_keys))
     st.stop()
 
 # --- Connect to Google Sheets ---
 def connect_to_gsheets():
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(gcp_credentials, scope)
-    client = gspread.authorize(creds)
-    return client
+    try:
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(gcp_credentials, scope)
+        client = gspread.authorize(creds)
+        return client
+    except Exception as e:
+        st.error("Error connecting to Google Sheets: " + str(e))
+        st.stop()
 
-# Open the Google Sheet using your provided URL
+# Open the Google Sheet using your provided URL (replace with your actual sheet ID)
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1oczFh_1CRNZE2zdpyUyLSJvOU0AYAjlQBLd8VFpkX_w/edit"
 client = connect_to_gsheets()
-# Explicitly open the worksheet named "Sheet1"
-sheet = client.open_by_url(SHEET_URL).worksheet("Sheet1")
+try:
+    # Explicitly open the worksheet named "Sheet1"
+    sheet = client.open_by_url(SHEET_URL).worksheet("Sheet1")
+except Exception as e:
+    st.error("Error opening worksheet 'Sheet1': " + str(e))
+    st.stop()
 
 # --- Function to fetch car models from Column A (skip the header) ---
 def fetch_car_models():
-    models = sheet.col_values(1)[1:]  # Skip header row
-    return models if models else ["Geen modellen beschikbaar"]
+    try:
+        models = sheet.col_values(1)[1:]  # Skip header row
+        return models if models else ["Geen modellen beschikbaar"]
+    except Exception as e:
+        st.error("Error fetching car models: " + str(e))
+        return ["Error"]
 
 # --- Set up page configuration ---
 st.set_page_config(page_title="TCO Calculator", layout="centered")
