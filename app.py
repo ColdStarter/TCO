@@ -5,9 +5,24 @@ import pandas as pd
 import time  # For loading effect
 
 # --- Load Google Sheets credentials securely from Streamlit Secrets ---
-# st.secrets["gcp_credentials"] is already a dict; no need for json.loads()
+# In your Streamlit Cloud Secrets, use triple quotes for private_key as shown:
+# [gcp_credentials]
+# type = "service_account"
+# project_id = "tco-calculator-database"
+# private_key_id = "e1e5c6b1999c30a7dff2d1b010ec9314c152c1fe"
+# private_key = """-----BEGIN PRIVATE KEY-----
+# MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCVNeLpqulgucMs
+# ... (rest of your key) ...
+# -----END PRIVATE KEY-----"""
+# client_email = "tco-data-access@tco-calculator-database.iam.gserviceaccount.com"
+# client_id = "107794534909469767217"
+# auth_uri = "https://accounts.google.com/o/oauth2/auth"
+# token_uri = "https://oauth2.googleapis.com/token"
+# auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
+# client_x509_cert_url = "https://www.googleapis.com/robot/v1/metadata/x509/tco-data-access%40tco-calculator-database.iam.gserviceaccount.com"
+
 gcp_credentials = dict(st.secrets["gcp_credentials"])
-# Replace literal "\n" with actual newline characters in the private_key
+# Convert literal "\n" into actual newline characters in the private_key
 gcp_credentials["private_key"] = gcp_credentials["private_key"].replace('\\n', '\n')
 
 # --- Connect to Google Sheets ---
@@ -17,10 +32,11 @@ def connect_to_gsheets():
     client = gspread.authorize(creds)
     return client
 
-# Open the Google Sheet (replace YOUR_SHEET_ID with your actual sheet ID)
-SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit"
+# Open the Google Sheet (replace "your_sheet_id_here" with your actual sheet ID)
+SHEET_URL = "https://docs.google.com/spreadsheets/d/your_sheet_id_here/edit"
 client = connect_to_gsheets()
-sheet = client.open_by_url(SHEET_URL).sheet1  # Open first sheet
+# Explicitly open the worksheet named "Sheet1"
+sheet = client.open_by_url(SHEET_URL).worksheet("Sheet1")
 
 # --- Function to fetch car models from Column A (skip the header) ---
 def fetch_car_models():
@@ -108,6 +124,6 @@ if bereken:
 
     # Display result in a stylish container
     st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-    st.markdown(f'<div class="metric-label">Maandelijkse Total Cost of Ownership</div>', unsafe_allow_html=True)
+    st.markdown('<div class="metric-label">Maandelijkse Total Cost of Ownership</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="metric-value">€ {tco:,.2f}</div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
