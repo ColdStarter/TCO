@@ -48,9 +48,9 @@ with st.container():
         # For the date, we use a text field with dd/mm/YYYY format.
         default_date = datetime.date.today().strftime("%d/%m/%Y")
         registration_date_str = st.text_input("Datum eerste registratie (DD/MM/YYYY)", value=default_date)
-        fuel_type = st.selectbox("Type brandstof", options=["Benzine", "Diesel", "Hybride", "Electrisch"])
+        fuel_type = st.selectbox("Type brandstof", options=["Benzine", "Diesel", "Hybride", "Elektrisch"])
         co2 = st.number_input("CO2/km in gram", min_value=0, value=120, step=1)
-        if fuel_type == "Electrisch":
+        if fuel_type == "Elektrisch":
             consumption_label = "Verbruik per 100 km in kWh"
         else:
             consumption_label = "Verbruik per 100 km in liter"
