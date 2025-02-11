@@ -5,7 +5,10 @@ import pandas as pd
 import time  # For loading effect
 
 # --- Load Google Sheets credentials securely from Streamlit Secrets ---
-gcp_credentials = st.secrets["gcp_credentials"]  # No json.loads()
+# st.secrets["gcp_credentials"] is already a dict; no need for json.loads()
+gcp_credentials = dict(st.secrets["gcp_credentials"])
+# Replace literal "\n" with actual newline characters in the private_key
+gcp_credentials["private_key"] = gcp_credentials["private_key"].replace('\\n', '\n')
 
 # --- Connect to Google Sheets ---
 def connect_to_gsheets():
@@ -14,14 +17,14 @@ def connect_to_gsheets():
     client = gspread.authorize(creds)
     return client
 
-# Open the Google Sheet (replace YOUR_SHEET_ID)
+# Open the Google Sheet (replace YOUR_SHEET_ID with your actual sheet ID)
 SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit"
 client = connect_to_gsheets()
 sheet = client.open_by_url(SHEET_URL).sheet1  # Open first sheet
 
 # --- Function to fetch car models from Column A (skip the header) ---
 def fetch_car_models():
-    models = sheet.col_values(1)[1:]  # Skip header
+    models = sheet.col_values(1)[1:]  # Skip header row
     return models if models else ["Geen modellen beschikbaar"]
 
 # --- Set up page configuration ---
