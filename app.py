@@ -6,15 +6,14 @@ import time  # For loading effect
 
 # --- Load Google Sheets credentials securely from Streamlit Secrets ---
 try:
-    # st.secrets["gcp_credentials"] is already a dict if configured properly.
+    # st.secrets["gcp_credentials"] should be a dictionary if configured correctly.
     gcp_credentials = dict(st.secrets["gcp_credentials"])
 except Exception as e:
     st.error("Error loading gcp_credentials from secrets: " + str(e))
     st.stop()
 
-# Ensure the private key is properly formatted:
+# Ensure the private key has actual newlines
 if "private_key" in gcp_credentials:
-    # Remove any extra spaces and replace literal "\n" with actual newlines
     gcp_credentials["private_key"] = gcp_credentials["private_key"].strip().replace('\\n', '\n')
 else:
     st.error("private_key not found in gcp_credentials. Please check your secrets.")
@@ -41,7 +40,7 @@ def connect_to_gsheets():
         st.error("Error connecting to Google Sheets: " + str(e))
         st.stop()
 
-# Open the Google Sheet using your provided URL (replace with your actual sheet ID)
+# Open the Google Sheet using your provided URL
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1oczFh_1CRNZE2zdpyUyLSJvOU0AYAjlQBLd8VFpkX_w/edit"
 client = connect_to_gsheets()
 try:
