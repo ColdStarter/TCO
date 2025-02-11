@@ -5,13 +5,16 @@ import pandas as pd
 import time  # For loading effect
 
 # --- Load Google Sheets credentials securely from Streamlit Secrets ---
-# In your Streamlit Cloud Secrets, use triple quotes for private_key as shown:
+# Your secrets should be set in Streamlit Cloud in the following format:
+#
 # [gcp_credentials]
 # type = "service_account"
 # project_id = "tco-calculator-database"
 # private_key_id = "e1e5c6b1999c30a7dff2d1b010ec9314c152c1fe"
 # private_key = """-----BEGIN PRIVATE KEY-----
 # MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCVNeLpqulgucMs
+# i4xpv6J1bRnNA0GoTE6k84kaWbAHFzVo7CkLWnewK+l2KZg68IzfTljmZUSTEWTk
+# trv2SehHe/tExFZtH2PJRQ00lm4dQUhM+4+6mLLvpyK9kGF08k0Y4/NNn12wZRVW
 # ... (rest of your key) ...
 # -----END PRIVATE KEY-----"""
 # client_email = "tco-data-access@tco-calculator-database.iam.gserviceaccount.com"
@@ -32,8 +35,8 @@ def connect_to_gsheets():
     client = gspread.authorize(creds)
     return client
 
-# Open the Google Sheet (replace "your_sheet_id_here" with your actual sheet ID)
-SHEET_URL = "https://docs.google.com/spreadsheets/d/your_sheet_id_here/edit"
+# Open the Google Sheet using your provided URL
+SHEET_URL = "https://docs.google.com/spreadsheets/d/1oczFh_1CRNZE2zdpyUyLSJvOU0AYAjlQBLd8VFpkX_w/edit"
 client = connect_to_gsheets()
 # Explicitly open the worksheet named "Sheet1"
 sheet = client.open_by_url(SHEET_URL).worksheet("Sheet1")
@@ -119,7 +122,7 @@ if bereken:
     with st.spinner("Bezig met berekenen..."):
         time.sleep(1)  # Simulate processing time
 
-    # TCO Calculation: prijs divided by lease_maanden
+    # TCO Calculation: price divided by lease months
     tco = prijs / lease_maanden if lease_maanden > 0 else 0
 
     # Display result in a stylish container
