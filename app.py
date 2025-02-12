@@ -90,22 +90,23 @@ with st.sidebar:
     # Model als leeg invoerveld met een suggestie in lichtgrijze tekst
     model = st.text_input("Model", value="", placeholder="Bijv. X5 45e", help="Voer het model in")
     
-    # Datum eerste registratie als datumselector
-    datum_eerste_registratie = st.date_input("Datum eerste registratie")
-    
-    # Brandstoftype als enkele selectie
+    # Datum eerste registratie als datumselector zonder standaardwaarde
+    datum_eerste_registratie = st.text_input("Datum eerste registratie (DD/MM/YYYY)", placeholder="DD/MM/YYYY")
+
+    # Brandstoftype als enkele selectie zonder standaardwaarde
     brandstoftype = st.selectbox(
         "Brandstoftype",
-        options=["Benzine", "Diesel", "Hybride", "Elektrisch"],
+        options=["", "Benzine", "Diesel", "Hybride", "Elektrisch"],
         index=0,
+        format_func=lambda x: "Selecteer een optie" if x == "" else x,
         help="Selecteer het brandstoftype"
     )
     
-    # CO2-uitstoot als geheel getal
-    co2 = st.number_input("CO2/km in gram", min_value=0, value=120, step=1, format="%d")
+    # CO2-uitstoot als geheel getal, links uitgelijnd, geen standaardwaarde
+    co2 = st.text_input("CO2/km in gram", value="", placeholder="Bijv. 120", help="Voer de CO2-uitstoot in g/km")
     
-    # Prijs in correct euroformaat (€ X.XXX,XX)
-    prijs = st.text_input("Prijs (€)", value="", placeholder="Bijv. € 50.000,51", help="Voer de prijs in")
+    # Prijs in correct euroformaat (€ X.XXX,XX) zonder voorbeeldwaarde
+    prijs = st.text_input("Prijs (€)", value="", help="Voer de prijs in")
     
     # Aantal maanden leasing
     lease_maanden = st.number_input(
