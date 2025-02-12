@@ -84,7 +84,7 @@ with st.sidebar:
     st.markdown("## 🚗 Voertuiggegevens", unsafe_allow_html=True)
     
     # Haal de automerken op uit Google Sheets en toon ze in een selectbox
-    car_brands = fetch_car_brands()
+    car_brands = fetch_car_brand()
     brand = st.selectbox("Merk", options=car_brands, index=0, help="Selecteer het merk (bijv. BMW)")
     
     prijs = st.number_input(
