@@ -107,16 +107,9 @@ with st.sidebar:
     co2 = st.number_input("CO2/km in gram", min_value=0, step=1, format="%d", key="co2", help="Voer de CO2-uitstoot in g/km")
     st.markdown('<style>div[data-testid="stNumberInput"] input { text-align: left; }</style>', unsafe_allow_html=True)
 
-    # Prijs als tekstinvoer, geformatteerd in het euroformaat (€ X.XXX,XX)
-    prijs_input = st.text_input("Prijs (€)", value="", help="Voer de prijs in")
-    try:
-        if prijs_input:
-            prijs = float(prijs_input.replace(",", "."))
-            prijs = f"€ {prijs:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
-    except ValueError:
-        prijs = "Ongeldige invoer"
-
-    st.markdown(f"**Geformatteerde prijs:** {prijs}")
+ # Prijs als tekstinvoer, geformatteerd in het euroformaat (€ X.XXX,XX)
+    prijs_input = st.text_input("Prijs (€)", value="", help="Voer de prijs in", 
+                                on_change="formatPrice(this)", key="prijs_input")
     
     # Aantal maanden leasing als geheel getal, zonder standaardwaarde, links uitgelijnd
     lease_maanden = st.number_input("Aantal maanden leasing", min_value=1, step=1, format="%d", key="lease_maanden", help="Voer het aantal lease maanden in")
