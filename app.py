@@ -1,68 +1,43 @@
 import streamlit as st
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 import pandas as pd
-import time  # For loading effect
+import time  # Voor de loading-effect
 
-# --- Load Google Sheets credentials securely from Streamlit Secrets ---
-try:
-    # st.secrets["gcp_credentials"] should be a dictionary if configured correctly.
-    gcp_credentials = dict(st.secrets["gcp_credentials"])
-except Exception as e:
-    st.error("Error loading gcp_credentials from secrets: " + str(e))
-    st.stop()
+# --- Laad de Google Sheets credentials uit st.secrets ---
+# Je secrets zijn al correct geconfigureerd via triple quotes
+gcp_credentials = st.secrets["gcp_credentials"]
 
-# Ensure the private key has actual newlines
-if "private_key" in gcp_credentials:
-    gcp_credentials["private_key"] = gcp_credentials["private_key"].strip().replace('\\n', '\n')
-else:
-    st.error("private_key not found in gcp_credentials. Please check your secrets.")
-    st.stop()
+# Definieer de benodigde scopes
+scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 
-# Verify that all required keys are present
-required_keys = [
-    "type", "project_id", "private_key_id", "private_key", "client_email",
-    "client_id", "auth_uri", "token_uri", "auth_provider_x509_cert_url", "client_x509_cert_url"
-]
-missing_keys = [key for key in required_keys if key not in gcp_credentials]
-if missing_keys:
-    st.error("Missing keys in gcp_credentials: " + ", ".join(missing_keys))
-    st.stop()
+# Maak de credentials met google-auth (deze functie verwacht een dict)
+credentials = Credentials.from_service_account_info(gcp_credentials, scopes=scopes)
 
-# --- Connect to Google Sheets ---
-def connect_to_gsheets():
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    try:
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(gcp_credentials, scope)
-        client = gspread.authorize(creds)
-        return client
-    except Exception as e:
-        st.error("Error connecting to Google Sheets: " + str(e))
-        st.stop()
+# Verbind met Google Sheets via gspread
+client = gspread.authorize(credentials)
 
-# Open the Google Sheet using your provided URL
+# Open de Google Sheet (vervang de URL indien nodig)
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1oczFh_1CRNZE2zdpyUyLSJvOU0AYAjlQBLd8VFpkX_w/edit"
-client = connect_to_gsheets()
 try:
-    # Explicitly open the worksheet named "Sheet1"
     sheet = client.open_by_url(SHEET_URL).worksheet("Sheet1")
 except Exception as e:
     st.error("Error opening worksheet 'Sheet1': " + str(e))
     st.stop()
 
-# --- Function to fetch car models from Column A (skip the header) ---
+# --- Functie om automodellen uit kolom A op te halen (sla de header over) ---
 def fetch_car_models():
     try:
-        models = sheet.col_values(1)[1:]  # Skip header row
+        models = sheet.col_values(1)[1:]  # Sla de header over
         return models if models else ["Geen modellen beschikbaar"]
     except Exception as e:
         st.error("Error fetching car models: " + str(e))
         return ["Error"]
 
-# --- Set up page configuration ---
+# --- Pagina Configuratie ---
 st.set_page_config(page_title="TCO Calculator", layout="centered")
 
-# --- Custom CSS for styling ---
+# --- Custom CSS voor styling ---
 st.markdown(
     """
     <style>
@@ -103,11 +78,11 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# --- Sidebar (Dark Blue) ---
+# --- Sidebar (Donkerblauw) ---
 with st.sidebar:
     st.markdown("## 🚗 Voertuiggegevens", unsafe_allow_html=True)
     
-    # Fetch models from Google Sheets and use a selectbox for the model input
+    # Haal modellen op uit Google Sheets en toon ze in een selectbox
     car_models = fetch_car_models()
     model = st.selectbox("Model", options=car_models, index=0, help="Selecteer het model (bijv. X5 45e)")
     
@@ -128,17 +103,17 @@ with st.sidebar:
 
     bereken = st.button("Bereken TCO")
 
-# --- TCO Calculation and Display ---
+# --- TCO Berekening en Weergave ---
 st.markdown("## 📊 TCO Berekening", unsafe_allow_html=True)
 
 if bereken:
     with st.spinner("Bezig met berekenen..."):
-        time.sleep(1)  # Simulate processing time
+        time.sleep(1)  # Simuleer verwerkingstijd
 
-    # TCO Calculation: price divided by lease months
+    # TCO Berekening: prijs gedeeld door lease_maanden
     tco = prijs / lease_maanden if lease_maanden > 0 else 0
 
-    # Display result in a stylish container
+    # Resultaat weergeven in een stijlvolle container
     st.markdown('<div class="metric-container">', unsafe_allow_html=True)
     st.markdown('<div class="metric-label">Maandelijkse Total Cost of Ownership</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="metric-value">€ {tco:,.2f}</div>', unsafe_allow_html=True)
