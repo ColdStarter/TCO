@@ -107,14 +107,38 @@ with st.sidebar:
 # --- TCO Berekening en Weergave ---
 st.markdown("## 📊 TCO Berekening", unsafe_allow_html=True)
 
+from datetime import datetime
+
+# --- Functie om data naar Google Sheets te schrijven ---
+def save_to_google_sheets(model, prijs, lease_maanden, tco):
+    try:
+        # Open het werkblad "Output"
+        output_sheet = client.open_by_url(SHEET_URL).worksheet("Output")
+
+        # Huidige timestamp toevoegen
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Nieuwe rij met de ingevulde gegevens
+        new_row = [model, prijs, lease_maanden, tco, timestamp]
+
+        # Toevoegen aan het sheet (onderaan de bestaande rijen)
+        output_sheet.append_row(new_row)
+
+        st.success("✅ Gegevens succesvol opgeslagen in Google Sheets!")
+    except Exception as e:
+        st.error(f"❌ Fout bij opslaan in Google Sheets: {str(e)}")
+
 if bereken:
     with st.spinner("Bezig met berekenen..."):
         time.sleep(1)  # Simuleer verwerkingstijd
 
-    # Bereken de TCO: prijs gedeeld door lease_maanden
+    # Bereken de maandelijkse TCO
     tco = prijs / lease_maanden if lease_maanden > 0 else 0
 
-    # Toon het resultaat in een stijlvolle container
+    # 📌 Sla de data op in Google Sheets
+    save_to_google_sheets(model, prijs, lease_maanden, tco)
+
+    # 🎯 Toon het resultaat in de app
     st.markdown('<div class="metric-container">', unsafe_allow_html=True)
     st.markdown('<div class="metric-label">Maandelijkse Total Cost of Ownership</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="metric-value">€ {tco:,.2f}</div>', unsafe_allow_html=True)
