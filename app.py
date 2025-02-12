@@ -2,24 +2,25 @@ import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
 import pandas as pd
-import time  # Voor de loading-effect
+import time  # Voor een loading-effect
 
-# --- Laad de Google Sheets credentials uit st.secrets ---
-# Je secrets zijn al correct geconfigureerd via triple quotes
+# --- Laad de Google Sheets credentials uit Streamlit Secrets ---
+# Hier wordt ervan uitgegaan dat de secrets correct zijn geconfigureerd.
 gcp_credentials = st.secrets["gcp_credentials"]
 
-# Definieer de benodigde scopes
+# Definieer de benodigde scopes voor Sheets en Drive
 scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 
-# Maak de credentials met google-auth (deze functie verwacht een dict)
+# Maak de credentials met google-auth; deze functie verwacht een dict
 credentials = Credentials.from_service_account_info(gcp_credentials, scopes=scopes)
 
 # Verbind met Google Sheets via gspread
 client = gspread.authorize(credentials)
 
-# Open de Google Sheet (vervang de URL indien nodig)
+# Open de Google Sheet (vervang indien nodig de URL; deze URL is jouw sheet)
 SHEET_URL = "https://docs.google.com/spreadsheets/d/1oczFh_1CRNZE2zdpyUyLSJvOU0AYAjlQBLd8VFpkX_w/edit"
 try:
+    # Open expliciet het werkblad "Sheet1"
     sheet = client.open_by_url(SHEET_URL).worksheet("Sheet1")
 except Exception as e:
     st.error("Error opening worksheet 'Sheet1': " + str(e))
@@ -82,7 +83,7 @@ st.markdown(
 with st.sidebar:
     st.markdown("## 🚗 Voertuiggegevens", unsafe_allow_html=True)
     
-    # Haal modellen op uit Google Sheets en toon ze in een selectbox
+    # Haal de automodellen op uit Google Sheets en toon ze in een selectbox
     car_models = fetch_car_models()
     model = st.selectbox("Model", options=car_models, index=0, help="Selecteer het model (bijv. X5 45e)")
     
@@ -110,10 +111,10 @@ if bereken:
     with st.spinner("Bezig met berekenen..."):
         time.sleep(1)  # Simuleer verwerkingstijd
 
-    # TCO Berekening: prijs gedeeld door lease_maanden
+    # Bereken de TCO: prijs gedeeld door lease_maanden
     tco = prijs / lease_maanden if lease_maanden > 0 else 0
 
-    # Resultaat weergeven in een stijlvolle container
+    # Toon het resultaat in een stijlvolle container
     st.markdown('<div class="metric-container">', unsafe_allow_html=True)
     st.markdown('<div class="metric-label">Maandelijkse Total Cost of Ownership</div>', unsafe_allow_html=True)
     st.markdown(f'<div class="metric-value">€ {tco:,.2f}</div>', unsafe_allow_html=True)
