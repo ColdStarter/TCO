@@ -84,9 +84,27 @@ with st.sidebar:
     st.markdown("## 🚗 Voertuiggegevens", unsafe_allow_html=True)
     
     # Haal de automerken op uit Google Sheets en toon ze in een selectbox
-    car_brands = fetch_car_brand()
+    car_brands = fetch_car_brand()  # Zorg dat deze functie al bestaat en de merken ophaalt
     brand = st.selectbox("Merk", options=car_brands, index=0, help="Selecteer het merk (bijv. BMW)")
     
+    # Nieuw: Tekstveld voor Model
+    model = st.text_input("Model", value="X5 45e", help="Voer het model in (bijv. X5 45e)")
+    
+    # Nieuw: Datuminvoer voor Datum eerste registratie
+    datum_eerste_registratie = st.date_input("Datum eerste registratie")
+    
+    # Nieuw: Multiselector voor Brandstoftype
+    brandstoftype = st.multiselect(
+        "Brandstoftype",
+        options=["Benzine", "Diesel", "Hybride", "Elektrisch"],
+        default=["Benzine"],
+        help="Selecteer één of meerdere brandstoftypes"
+    )
+    
+    # Nieuw: Geheel getal voor CO2/km in gram
+    co2 = st.number_input("CO2/km in gram", min_value=0, value=120, step=1, format="%d")
+    
+    # Bestaande velden
     prijs = st.number_input(
         "Prijs (€)", 
         min_value=0.0, 
