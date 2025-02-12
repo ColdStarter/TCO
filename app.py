@@ -38,7 +38,7 @@ def fetch_car_brand():
 # --- Pagina Configuratie ---
 st.set_page_config(page_title="TCO Calculator", layout="centered")
 
-# --- Custom CSS en JavaScript voor styling en formatting ---
+# --- Custom CSS voor styling ---
 st.markdown(
     """
     <style>
@@ -78,14 +78,6 @@ st.markdown(
         color: gray;
     }
     </style>
-    <script>
-    function formatPrice(input) {
-        let value = input.value.replace(/[^\d,]/g, '');
-        let parts = value.split(',');
-        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-        input.value = parts.join(',');
-    }
-    </script>
     """, 
     unsafe_allow_html=True
 )
@@ -117,8 +109,13 @@ with st.sidebar:
     co2 = st.number_input("CO2/km in gram", min_value=0, step=1, format="%d", key="co2", help="Voer de CO2-uitstoot in g/km")
 
     # Prijs als tekstinvoer, geformatteerd in het euroformaat (€ X.XXX,XX)
-    prijs_input = st.text_input("Prijs (€)", value="", help="Voer de prijs in", 
-                                on_change="formatPrice(this)", key="prijs_input")
+    prijs_input = st.text_input("Prijs (€)", value="", help="Voer de prijs in")
+    try:
+        if prijs_input:
+            prijs = float(prijs_input.replace(",", "."))
+            prijs = f"€ {prijs:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except ValueError:
+        st.error("Ongeldige invoer voor prijs")
 
     # Aantal maanden leasing als geheel getal, zonder standaardwaarde, links uitgelijnd
     lease_maanden = st.number_input("Aantal maanden leasing", min_value=1, step=1, format="%d", key="lease_maanden", help="Voer het aantal lease maanden in")
