@@ -38,7 +38,7 @@ def fetch_car_brand():
 # --- Pagina Configuratie ---
 st.set_page_config(page_title="TCO Calculator", layout="centered")
 
-# --- Custom CSS voor styling ---
+# --- Custom CSS en JavaScript voor styling en formatting ---
 st.markdown(
     """
     <style>
@@ -50,6 +50,9 @@ st.markdown(
         color: white;
     }
     .stNumberInput input {
+        text-align: left;
+    }
+    .stTextInput input {
         text-align: right;
     }
     .stButton>button {
@@ -75,11 +78,18 @@ st.markdown(
         color: gray;
     }
     </style>
+    <script>
+    function formatPrice(input) {
+        let value = input.value.replace(/[^\d,]/g, '');
+        let parts = value.split(',');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        input.value = parts.join(',');
+    }
+    </script>
     """, 
     unsafe_allow_html=True
 )
 
-# --- Sidebar (Donkerblauw) ---
 # --- Sidebar (Donkerblauw) ---
 with st.sidebar:
     st.markdown("## 🚗 Voertuiggegevens", unsafe_allow_html=True)
@@ -105,15 +115,13 @@ with st.sidebar:
     
     # CO2-uitstoot als geheel getal met validatie, links uitgelijnd
     co2 = st.number_input("CO2/km in gram", min_value=0, step=1, format="%d", key="co2", help="Voer de CO2-uitstoot in g/km")
-    st.markdown('<style>div[data-testid="stNumberInput"] input { text-align: left; }</style>', unsafe_allow_html=True)
 
- # Prijs als tekstinvoer, geformatteerd in het euroformaat (€ X.XXX,XX)
+    # Prijs als tekstinvoer, geformatteerd in het euroformaat (€ X.XXX,XX)
     prijs_input = st.text_input("Prijs (€)", value="", help="Voer de prijs in", 
                                 on_change="formatPrice(this)", key="prijs_input")
-    
+
     # Aantal maanden leasing als geheel getal, zonder standaardwaarde, links uitgelijnd
     lease_maanden = st.number_input("Aantal maanden leasing", min_value=1, step=1, format="%d", key="lease_maanden", help="Voer het aantal lease maanden in")
-    st.markdown('<style>div[data-testid="stNumberInput"] input { text-align: left; }</style>', unsafe_allow_html=True)
 
     bereken = st.button("Bereken TCO")
 
