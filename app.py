@@ -26,13 +26,13 @@ except Exception as e:
     st.error("Error opening worksheet 'Sheet1': " + str(e))
     st.stop()
 
-# --- Functie om automodellen uit kolom A op te halen (sla de header over) ---
-def fetch_car_models():
+# --- Functie om automerken uit kolom A op te halen (sla de header over) ---
+def fetch_car_brand():
     try:
-        models = sheet.col_values(1)[1:]  # Sla de header over
-        return models if models else ["Geen modellen beschikbaar"]
+        brands = sheet.col_values(1)[1:]  # Sla de header over
+        return brands if brands else ["Geen merken beschikbaar"]
     except Exception as e:
-        st.error("Error fetching car models: " + str(e))
+        st.error("Error fetching car brands: " + str(e))
         return ["Error"]
 
 # --- Pagina Configuratie ---
@@ -83,9 +83,9 @@ st.markdown(
 with st.sidebar:
     st.markdown("## 🚗 Voertuiggegevens", unsafe_allow_html=True)
     
-    # Haal de automodellen op uit Google Sheets en toon ze in een selectbox
-    car_models = fetch_car_models()
-    model = st.selectbox("Model", options=car_models, index=0, help="Selecteer het model (bijv. X5 45e)")
+    # Haal de automerken op uit Google Sheets en toon ze in een selectbox
+    car_brands = fetch_car_brands()
+    brand = st.selectbox("Merk", options=car_brands, index=0, help="Selecteer het merk (bijv. BMW)")
     
     prijs = st.number_input(
         "Prijs (€)", 
@@ -110,7 +110,7 @@ st.markdown("## 📊 TCO Berekening", unsafe_allow_html=True)
 from datetime import datetime
 
 # --- Functie om data naar Google Sheets te schrijven ---
-def save_to_google_sheets(model, prijs, lease_maanden, tco):
+def save_to_google_sheets(Merk, prijs, lease_maanden, tco):
     try:
         # Open het werkblad "Output"
         output_sheet = client.open_by_url(SHEET_URL).worksheet("Output")
@@ -119,7 +119,7 @@ def save_to_google_sheets(model, prijs, lease_maanden, tco):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Nieuwe rij met de ingevulde gegevens
-        new_row = [model, prijs, lease_maanden, tco, timestamp]
+        new_row = [merk, prijs, lease_maanden, tco, timestamp]
 
         # Toevoegen aan het sheet (onderaan de bestaande rijen)
         output_sheet.append_row(new_row)
@@ -136,7 +136,7 @@ if bereken:
     tco = prijs / lease_maanden if lease_maanden > 0 else 0
 
     # 📌 Sla de data op in Google Sheets
-    save_to_google_sheets(model, prijs, lease_maanden, tco)
+    save_to_google_sheets(merk, prijs, lease_maanden, tco)
 
     # 🎯 Toon het resultaat in de app
     st.markdown('<div class="metric-container">', unsafe_allow_html=True)
