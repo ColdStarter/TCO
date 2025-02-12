@@ -84,35 +84,30 @@ with st.sidebar:
     st.markdown("## 🚗 Voertuiggegevens", unsafe_allow_html=True)
     
     # Haal de automerken op uit Google Sheets en toon ze in een selectbox
-    car_brands = fetch_car_brand()  # Zorg dat deze functie al bestaat en de merken ophaalt
-    brand = st.selectbox("Merk", options=car_brands, index=0, help="Selecteer het merk (bijv. BMW)")
+    car_brands = fetch_car_brand()  # Zorg dat deze functie de merken correct ophaalt
+    brand = st.text_input("Merk", value="", placeholder="Bijv. BMW", help="Voer het merk in")
     
-    # Nieuw: Tekstveld voor Model
-    model = st.text_input("Model", value="X5 45e", help="Voer het model in (bijv. X5 45e)")
+    # Model als leeg invoerveld met een suggestie in lichtgrijze tekst
+    model = st.text_input("Model", value="", placeholder="Bijv. X5 45e", help="Voer het model in")
     
-    # Nieuw: Datuminvoer voor Datum eerste registratie
+    # Datum eerste registratie als datumselector
     datum_eerste_registratie = st.date_input("Datum eerste registratie")
     
-    # Nieuw: Multiselector voor Brandstoftype
-    brandstoftype = st.multiselect(
+    # Brandstoftype als enkele selectie
+    brandstoftype = st.selectbox(
         "Brandstoftype",
         options=["Benzine", "Diesel", "Hybride", "Elektrisch"],
-        default=["Benzine"],
-        help="Selecteer één of meerdere brandstoftypes"
+        index=0,
+        help="Selecteer het brandstoftype"
     )
     
-    # Nieuw: Geheel getal voor CO2/km in gram
+    # CO2-uitstoot als geheel getal
     co2 = st.number_input("CO2/km in gram", min_value=0, value=120, step=1, format="%d")
     
-    # Bestaande velden
-    prijs = st.number_input(
-        "Prijs (€)", 
-        min_value=0.0, 
-        value=50000.0, 
-        step=1000.0, 
-        format="%.2f"
-    )
-
+    # Prijs in correct euroformaat (€ X.XXX,XX)
+    prijs = st.text_input("Prijs (€)", value="", placeholder="Bijv. € 50.000,51", help="Voer de prijs in")
+    
+    # Aantal maanden leasing
     lease_maanden = st.number_input(
         "Aantal maanden leasing", 
         min_value=1, 
