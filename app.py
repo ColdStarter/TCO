@@ -91,8 +91,8 @@ with st.sidebar:
     model = st.text_input("Model", value="", placeholder="Bijv. X5 45e", help="Voer het model in")
     
     # Datum eerste registratie als datumselector zonder standaardwaarde
-    datum_eerste_registratie = st.text_input("Datum eerste registratie (DD/MM/YYYY)", placeholder="DD/MM/YYYY")
-
+    datum_eerste_registratie = st.date_input("Datum eerste registratie", value=None, help="Selecteer de eerste registratiedatum")
+    
     # Brandstoftype als enkele selectie zonder standaardwaarde
     brandstoftype = st.selectbox(
         "Brandstoftype",
@@ -102,19 +102,22 @@ with st.sidebar:
         help="Selecteer het brandstoftype"
     )
     
-    # CO2-uitstoot als geheel getal, links uitgelijnd, geen standaardwaarde
-    co2 = st.text_input("CO2/km in gram", value="", placeholder="Bijv. 120", help="Voer de CO2-uitstoot in g/km")
+    # CO2-uitstoot als geheel getal met validatie
+    co2 = st.number_input("CO2/km in gram", min_value=0, step=1, format="%d", help="Voer de CO2-uitstoot in g/km")
+
+    # Prijs als tekstinvoer, geformatteerd in het euroformaat (€ X.XXX,XX)
+    prijs_input = st.text_input("Prijs (€)", value="", help="Voer de prijs in")
+    try:
+        if prijs_input:
+            prijs = float(prijs_input.replace(",", "."))
+            prijs = f"€ {prijs:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
+    except ValueError:
+        prijs = "Ongeldige invoer"
+
+    st.markdown(f"**Geformatteerde prijs:** {prijs}")
     
-    # Prijs in correct euroformaat (€ X.XXX,XX) zonder voorbeeldwaarde
-    prijs = st.text_input("Prijs (€)", value="", help="Voer de prijs in")
-    
-    # Aantal maanden leasing
-    lease_maanden = st.number_input(
-        "Aantal maanden leasing", 
-        min_value=1, 
-        value=36, 
-        step=1
-    )
+    # Aantal maanden leasing als geheel getal, zonder standaardwaarde, links uitgelijnd
+    lease_maanden = st.number_input("Aantal maanden leasing", min_value=1, step=1, format="%d", help="Voer het aantal lease maanden in")
 
     bereken = st.button("Bereken TCO")
 
