@@ -80,6 +80,7 @@ st.markdown(
 )
 
 # --- Sidebar (Donkerblauw) ---
+# --- Sidebar (Donkerblauw) ---
 with st.sidebar:
     st.markdown("## 🚗 Voertuiggegevens", unsafe_allow_html=True)
     
@@ -102,8 +103,9 @@ with st.sidebar:
         help="Selecteer het brandstoftype"
     )
     
-    # CO2-uitstoot als geheel getal met validatie
-    co2 = st.number_input("CO2/km in gram", min_value=0, step=1, format="%d", help="Voer de CO2-uitstoot in g/km")
+    # CO2-uitstoot als geheel getal met validatie, links uitgelijnd
+    co2 = st.number_input("CO2/km in gram", min_value=0, step=1, format="%d", key="co2", help="Voer de CO2-uitstoot in g/km")
+    st.markdown('<style>div[data-testid="stNumberInput"] input { text-align: left; }</style>', unsafe_allow_html=True)
 
     # Prijs als tekstinvoer, geformatteerd in het euroformaat (€ X.XXX,XX)
     prijs_input = st.text_input("Prijs (€)", value="", help="Voer de prijs in")
@@ -117,7 +119,8 @@ with st.sidebar:
     st.markdown(f"**Geformatteerde prijs:** {prijs}")
     
     # Aantal maanden leasing als geheel getal, zonder standaardwaarde, links uitgelijnd
-    lease_maanden = st.number_input("Aantal maanden leasing", min_value=1, step=1, format="%d", help="Voer het aantal lease maanden in")
+    lease_maanden = st.number_input("Aantal maanden leasing", min_value=1, step=1, format="%d", key="lease_maanden", help="Voer het aantal lease maanden in")
+    st.markdown('<style>div[data-testid="stNumberInput"] input { text-align: left; }</style>', unsafe_allow_html=True)
 
     bereken = st.button("Bereken TCO")
 
